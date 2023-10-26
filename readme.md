@@ -7,6 +7,65 @@
 
 Media sorting tool to organize photos and videos from your camera in folders by year, month and day.
 
+Forked from:
+https://github.com/ivandokov/phockup
+
+**Docker**
+Dockerfile base image was modified to add the possibility to specify the User and Timezone of the container.
+
+DockerCompose example:
+
+    phockup:
+      container_name: phockup
+      image: tiagoqpinto/phockup
+      restart: always
+      volumes:
+        - INPUT_FOLDER:/mnt/input
+        - OUTPUT_FOLDER:/mnt/output
+      environment:
+        - OPTIONS=-d YYYY -m
+        - PUID=${PUID}
+        - PGID=${PGID}
+        - TZ=Europe/Lisbon
+        - CRON=0 2 * * *
+
+For pictures and videos to separated folders:
+
+    phockup_pictures:
+      container_name: phockup_pictures
+      image: tiagoqpinto/phockup
+      restart: always
+      volumes:
+        - MEDIA_INPUT:/mnt/input
+        - PICTURES_OUTPUT:/mnt/output
+      environment:
+        - OPTIONS=-d YYYY --file-type=image -m
+        - PUID=${PUID}
+        - PGID=${PGID}
+        - TZ=Europe/Lisbon
+        - CRON=35 21 * * *
+
+    phockup_videos:
+      container_name: phockup_videos
+      image: tiagoqpinto/phockup
+      restart: always
+      volumes:
+        - MEDIA_INPUT:/mnt/input
+        - VIDEOS_OUTPUT:/mnt/output
+      environment:
+        - OPTIONS=-d YYYY --file-type=video -m
+        - PUID=${PUID}
+        - PGID=${PGID}
+        - TZ=Europe/Lisbon
+        - CRON=40 21 * * *
+
+For the developer, build and push commands:
+
+```
+docker build -t tiagoqpinto/phockup:latest -t tiagoqpinto/phockup:v1.0.0 .
+docker image push --all-tags tiagoqpinto/phockup
+```
+
 ## How it works
 The software will collect all files from the input directory and copy them to the output directory without changing the files content. It will only rename the files and place them in the proper directory for year, month and day.
 
